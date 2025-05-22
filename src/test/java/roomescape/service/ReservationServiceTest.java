@@ -1,14 +1,10 @@
 package roomescape.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -20,18 +16,11 @@ import roomescape.domain.Reservation;
 import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
-import roomescape.exception.NotFoundReservationException;
-import roomescape.exception.NotFoundReservationTimeException;
-import roomescape.exception.UnableCreateReservationException;
 import roomescape.persistence.MemberRepository;
 import roomescape.persistence.ReservationRepository;
 import roomescape.persistence.ReservationTimeRepository;
 import roomescape.persistence.ThemeRepository;
 import roomescape.service.param.CreateReservationParam;
-import roomescape.service.result.MemberResult;
-import roomescape.service.result.ReservationResult;
-import roomescape.service.result.ReservationTimeResult;
-import roomescape.service.result.ThemeResult;
 
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -64,7 +53,7 @@ class ReservationServiceTest {
         Member member = new Member(null, "name", MemberRole.USER, "email", "password");
         memberRepository.save(member);
 
-        CreateReservationParam createReservationParam = new CreateReservationParam(1L, RESERVATION_DATE, 1L, 1L);
+        CreateReservationParam createReservationParam = new CreateReservationParam(1L, RESERVATION_DATE, 1L, 1L, ReservationStatus.RESERVED);
 
         //when
         Long createdId = reservationService.create(createReservationParam, LocalDateTime.now());

@@ -52,14 +52,17 @@ public class Reservation {
         this.status = status;
     }
 
-    public static Reservation makeTransientReserve(Member member, LocalDate date, ReservationTime time, Theme theme) {
+    public static Reservation makeTransientReservation(Member member, LocalDate date, ReservationTime time, Theme theme, ReservationStatus status) {
+        /*? [고민] status 의 null 허용은 위험할 수 있다.
+        프론트엔드에서 요청 실수 시, 의도한 status 와는 무관하게 예약 처리 될 수 있기 때문이다.
+         */
         return new Reservation(
                 null,
                 member,
                 date,
                 time,
                 theme,
-                ReservationStatus.RESERVED
+                status
         );
     }
 

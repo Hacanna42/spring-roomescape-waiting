@@ -78,8 +78,8 @@ public class ReservationService {
                 .toList();
     }
 
-    public List<ReservationResult> findReservationsInConditions(Long memberId, Long themeId, LocalDate dateFrom, LocalDate dateTo) {
-        List<Reservation> reservations = reservationRepository.findReservationsInConditions(memberId, themeId, dateFrom, dateTo);
+    public List<ReservationResult> findReservationsInConditions(Long memberId, Long themeId, LocalDate dateFrom, LocalDate dateTo, ReservationStatus status) {
+        List<Reservation> reservations = reservationRepository.findReservationsInConditions(memberId, themeId, dateFrom, dateTo, status);
         return reservations.stream()
                 .map(ReservationResult::from)
                 .toList();

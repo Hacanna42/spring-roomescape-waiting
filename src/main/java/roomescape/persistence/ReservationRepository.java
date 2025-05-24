@@ -22,6 +22,8 @@ public interface ReservationRepository extends ListCrudRepository<Reservation, L
 
     List<Reservation> findByMemberId(Long memberId);
 
+    boolean existsByIdAndStatus(Long reservationId, ReservationStatus status);
+
     @Query("""
         SELECT r
         FROM Reservation r

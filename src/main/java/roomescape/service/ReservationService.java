@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
@@ -14,7 +16,7 @@ import roomescape.exception.NotFoundMemberException;
 import roomescape.exception.NotFoundReservationException;
 import roomescape.exception.NotFoundReservationTimeException;
 import roomescape.exception.NotFoundThemeException;
-import roomescape.exception.UnableCreateReservationException;
+import roomescape.exception.UnableReservationException;
 import roomescape.persistence.MemberRepository;
 import roomescape.persistence.ReservationRepository;
 import roomescape.persistence.ReservationTimeRepository;
@@ -87,18 +89,34 @@ public class ReservationService {
 
     private void validateUniqueReservation(final CreateReservationParam createReservationParam, final ReservationTime reservationTime, final Theme theme) {
         if (createReservationParam.status() == ReservationStatus.RESERVED && reservationRepository.existsByDateAndTimeIdAndThemeIdAndStatus(createReservationParam.date(), reservationTime.getId(), theme.getId(), ReservationStatus.RESERVED)) {
-            throw new UnableCreateReservationException("테마에 대해 날짜와 시간이 중복된 예약이 존재합니다.");
+            throw new UnableReservationException("테마에 대해 날짜와 시간이 중복된 예약이 존재합니다.");
         }
     }
 
     private void validateReservationDateTime(final CreateReservationParam createReservationParam, final LocalDateTime currentDateTime, final ReservationTime reservationTime) {
         LocalDateTime reservationDateTime = LocalDateTime.of(createReservationParam.date(), reservationTime.getStartAt());
         if (reservationDateTime.isBefore(currentDateTime)) {
-            throw new UnableCreateReservationException("지난 날짜와 시간에 대한 예약은 불가능합니다.");
+            throw new UnableReservationException("지난 날짜와 시간에 대한 예약은 불가능합니다.");
         }
         Duration duration = Duration.between(currentDateTime, reservationDateTime);
         if (duration.toMinutes() < 10) {
-            throw new UnableCreateReservationException("예약 시간까지 10분도 남지 않아 예약이 불가합니다.");
+            throw new UnableReservationException("예약 시간까지 10분도 남지 않아 예약이 불가합니다.");
         }
+    }
+
+    @Transactional
+    public void approveWaitingReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new NotFoundReservationException(reservationId + "에 해당하는 reservation 튜플이 없습니다."));
+
+        if (reservationRepository.existsByDateAndTimeIdAndThemeIdAndStatus(
+                reservation.getDate(),
+                reservation.getTime().getId(),
+                reservation.getTheme().getId(),
+                ReservationStatus.RESERVED)) {
+            throw new UnableReservationException("이미 유저의 예약이 존재해서, 예약을 승인할 수 없습니다.");
+        }
+
+        reservation.setStatus(ReservationStatus.RESERVED);
     }
 }

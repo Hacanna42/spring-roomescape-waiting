@@ -1,5 +1,6 @@
 package roomescape.controller;
 
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,6 +56,12 @@ public class ReservationController {
         Long reservationId = reservationService.create(createReservationRequest.toServiceParam(loginMemberInfo.id()), LocalDateTime.now());
         ReservationResult reservationResult = reservationService.findById(reservationId);
         return ResponseEntity.status(HttpStatus.CREATED).body(ReservationResponse.from(reservationResult));
+    }
+
+    @PatchMapping("/reservations/{reservationId}/status")
+    public ResponseEntity<ReservationResponse> updateReservationStatus(@PathVariable Long reservationId) {
+        reservationService.approveWaitingReservation(reservationId);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/reservations/{reservationId}")

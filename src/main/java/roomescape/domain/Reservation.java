@@ -66,6 +66,10 @@ public class Reservation {
         );
     }
 
+    public void setStatus(ReservationStatus status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (o == null || getClass() != o.getClass()) {

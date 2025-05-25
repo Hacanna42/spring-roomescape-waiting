@@ -82,7 +82,6 @@ class ReservationServiceTest {
                 ));
     }
 
-    // TODO: 테스트 코드 리팩토링
     @Test
     void 예약을_생성할때_timeId가_데이터베이스에_존재하지_않는다면_예외가_발생한다() {
         // given

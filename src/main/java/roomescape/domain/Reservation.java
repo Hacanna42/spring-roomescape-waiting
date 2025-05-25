@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,6 +39,7 @@ public class Reservation {
     @JoinColumn(nullable = false)
     private Theme theme;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReservationStatus status;
@@ -64,10 +66,6 @@ public class Reservation {
                 theme,
                 status
         );
-    }
-
-    public void setStatus(ReservationStatus status) {
-        this.status = status;
     }
 
     @Override

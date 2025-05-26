@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.domain.Member;
 import roomescape.domain.MemberRole;
+import roomescape.fixture.Fixtures;
 
 @DataJpaTest
 class MemberRepositoryTest {
     private final MemberRepository memberRepository;
     private final EntityManager entityManager;
-    private final Member dummyMember = new Member(null, "히스타", MemberRole.USER, "hista@email.com", "password");
 
     @Autowired
     public MemberRepositoryTest(MemberRepository memberRepository, EntityManager entityManager) {
@@ -24,10 +24,10 @@ class MemberRepositoryTest {
     @Test
     void findByEmail() {
         // given
-        entityManager.persist(dummyMember);
+        entityManager.persist(Fixtures.member);
 
         // when
-        Optional<Member> foundMemberOptional = memberRepository.findByEmail(dummyMember.getEmail());
+        Optional<Member> foundMemberOptional = memberRepository.findByEmail(Fixtures.member.getEmail());
 
         // then
         assertTrue(foundMemberOptional.isPresent(), "Member should be found by email");
@@ -36,10 +36,10 @@ class MemberRepositoryTest {
     @Test
     void existsByEmail() {
         // given
-        entityManager.persist(dummyMember);
+        entityManager.persist(Fixtures.member);
 
         // when
-        boolean actual = memberRepository.existsByEmail(dummyMember.getEmail());
+        boolean actual = memberRepository.existsByEmail(Fixtures.member.getEmail());
 
         // then
         assertTrue(actual, "Member should exist by email");

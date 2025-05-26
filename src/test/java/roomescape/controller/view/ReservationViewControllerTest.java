@@ -5,27 +5,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import roomescape.auth.CookieProvider;
-import roomescape.auth.JwtTokenProvider;
-import roomescape.service.MemberService;
+import roomescape.config.TestWebmvcConfiguration;
 
 @WebMvcTest(ReservationViewController.class)
+@Import(TestWebmvcConfiguration.class)
 class ReservationViewControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @MockitoBean
-    private CookieProvider cookieProvider;
-
-    @MockitoBean
-    private JwtTokenProvider jwtTokenProvider;
-
-    @MockitoBean
-    private MemberService memberService;
 
     @Test
     void reservation() throws Exception {

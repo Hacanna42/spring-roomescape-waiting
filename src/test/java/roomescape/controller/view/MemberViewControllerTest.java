@@ -6,25 +6,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.auth.CookieProvider;
 import roomescape.auth.JwtTokenProvider;
+import roomescape.config.TestWebmvcConfiguration;
 import roomescape.service.MemberService;
 
 @WebMvcTest(MemberViewController.class)
+@Import(TestWebmvcConfiguration.class)
 class MemberViewControllerTest {
+
     @Autowired
     private MockMvc mockMvc;
-
-    @MockitoBean
-    private CookieProvider cookieProvider;
-
-    @MockitoBean
-    private JwtTokenProvider jwtTokenProvider;
-
-    @MockitoBean
-    private MemberService memberService;
 
     @Test
     void signup() throws Exception {

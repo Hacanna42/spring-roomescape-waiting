@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.domain.Member;
-import roomescape.domain.MemberRole;
 import roomescape.fixture.Fixtures;
 
 @DataJpaTest
@@ -24,10 +23,11 @@ class MemberRepositoryTest {
     @Test
     void findByEmail() {
         // given
-        entityManager.persist(Fixtures.member);
+        Member member = Fixtures.member();
+        entityManager.persist(member);
 
         // when
-        Optional<Member> foundMemberOptional = memberRepository.findByEmail(Fixtures.member.getEmail());
+        Optional<Member> foundMemberOptional = memberRepository.findByEmail(member.getEmail());
 
         // then
         assertTrue(foundMemberOptional.isPresent(), "Member should be found by email");
@@ -36,10 +36,11 @@ class MemberRepositoryTest {
     @Test
     void existsByEmail() {
         // given
-        entityManager.persist(Fixtures.member);
+        Member member = Fixtures.member();
+        entityManager.persist(member);
 
         // when
-        boolean actual = memberRepository.existsByEmail(Fixtures.member.getEmail());
+        boolean actual = memberRepository.existsByEmail(member.getEmail());
 
         // then
         assertTrue(actual, "Member should exist by email");

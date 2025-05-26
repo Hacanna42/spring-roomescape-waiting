@@ -14,7 +14,6 @@ import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,7 +38,6 @@ public class Reservation {
     @JoinColumn(nullable = false)
     private Theme theme;
 
-    @Setter
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReservationStatus status;
@@ -55,9 +53,6 @@ public class Reservation {
     }
 
     public static Reservation makeTransientReservation(Member member, LocalDate date, ReservationTime time, Theme theme, ReservationStatus status) {
-        /*? [고민] status 의 null 허용은 위험할 수 있다.
-        프론트엔드에서 요청 실수 시, 의도한 status 와는 무관하게 예약 처리 될 수 있기 때문이다.
-         */
         return new Reservation(
                 null,
                 member,
@@ -66,6 +61,10 @@ public class Reservation {
                 theme,
                 status
         );
+    }
+
+    public void approveToReserve() {
+        this.status = ReservationStatus.RESERVED;
     }
 
     @Override

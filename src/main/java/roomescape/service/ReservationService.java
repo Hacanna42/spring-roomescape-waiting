@@ -117,6 +117,6 @@ public class ReservationService {
             throw new UnableReservationException("이미 유저의 예약이 존재해서, 예약을 승인할 수 없습니다.");
         }
 
-        reservation.setStatus(ReservationStatus.RESERVED);
+        reservation.approveToReserve();
     }
 }

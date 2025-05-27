@@ -478,4 +478,95 @@ class ReservationServiceTest {
         //then
         assertThat(reservationResults.size()).isEqualTo(1);
     }
+
+    @Test
+    void 예약_대기를_승인할때_이미_다른_유저의_예약이_있다면_예외가_발생한다() {
+        //given
+        ReservationTime reservationTime = new ReservationTime(null, LocalTime.of(12, 0));
+        Theme theme = new Theme(null, "test", "description", "thumbnail");
+        Member alreadyReservedMember = new Member(null, "name1", MemberRole.USER, "email1", "password1");
+        Member willReserveMember = new Member(null, "name2", MemberRole.USER, "email2", "password2");
+        reservationTimeRepository.save(reservationTime);
+        themeRepository.save(theme);
+        memberRepository.save(alreadyReservedMember);
+        memberRepository.save(willReserveMember);
+        reservationRepository.save(new Reservation(
+                null,
+                alreadyReservedMember,
+                RESERVATION_DATE,
+                reservationTime,
+                theme,
+                ReservationStatus.RESERVED
+        ));
+        reservationRepository.save(new Reservation(
+                null,
+                willReserveMember,
+                RESERVATION_DATE,
+                reservationTime,
+                theme,
+                ReservationStatus.WAITING
+        ));
+
+        //when & then
+        assertThatThrownBy(() -> reservationService.approveWaitingReservation(2L))
+                .isInstanceOf(UnableReservationException.class)
+                .hasMessage("이미 다른 유저의 예약이 존재해서, 예약을 승인할 수 없습니다.");
+    }
+
+    @Test
+    void 예약_대기를_승인할때_예약이_대기중이_아니라면_예외가_발생한다() {
+        //given
+        ReservationTime reservationTime = new ReservationTime(null, LocalTime.of(12, 0));
+        Theme theme = new Theme(null, "test", "description", "thumbnail");
+        Member member = new Member(null, "name1", MemberRole.USER, "email1", "password1");
+        reservationTimeRepository.save(reservationTime);
+        themeRepository.save(theme);
+        memberRepository.save(member);
+        reservationRepository.save(new Reservation(
+                null,
+                member,
+                RESERVATION_DATE,
+                reservationTime,
+                theme,
+                ReservationStatus.RESERVED
+        ));
+
+        //when & then
+        assertThatThrownBy(() -> reservationService.approveWaitingReservation(1L))
+                .isInstanceOf(UnableReservationException.class)
+                .hasMessage("대기 중인 예약만 승인할 수 있습니다.");
+    }
+
+    @Test
+    void 예약_대기를_승인할때_예약이_존재하지_않는다면_예외가_발생한다() {
+        //when & then
+        assertThatThrownBy(() -> reservationService.approveWaitingReservation(1L))
+                .isInstanceOf(NotFoundReservationException.class)
+                .hasMessage("1에 해당하는 reservation 튜플이 없습니다.");
+    }
+
+    @Test
+    void 예약_대기를_승인할때_다른_유저의_예약이_없다면_승인된다() {
+        //given
+        ReservationTime reservationTime = new ReservationTime(null, LocalTime.of(12, 0));
+        Theme theme = new Theme(null, "test", "description", "thumbnail");
+        Member member = new Member(null, "name1", MemberRole.USER, "email1", "password1");
+        reservationTimeRepository.save(reservationTime);
+        themeRepository.save(theme);
+        memberRepository.save(member);
+        reservationRepository.save(new Reservation(
+                null,
+                member,
+                RESERVATION_DATE,
+                reservationTime,
+                theme,
+                ReservationStatus.WAITING
+        ));
+
+        //when
+        reservationService.approveWaitingReservation(1L);
+
+        //then
+        assertThat(reservationRepository.findById(1L).get().getStatus()).isEqualTo(ReservationStatus.RESERVED);
+    }
 }

@@ -108,6 +108,10 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new NotFoundReservationException(reservationId + "에 해당하는 reservation 튜플이 없습니다."));
 
+        if (reservation.getStatus()  != ReservationStatus.WAITING) {
+            throw new UnableReservationException("대기 중인 예약만 승인할 수 있습니다.");
+        }
+
         if (reservationRepository.existsByDateAndTimeIdAndThemeIdAndStatus(
                 reservation.getDate(),
                 reservation.getTime().getId(),

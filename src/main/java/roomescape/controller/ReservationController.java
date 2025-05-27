@@ -57,8 +57,8 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ReservationResponse.from(reservationResult));
     }
 
-    @PatchMapping("/reservations/{reservationId}/status")
-    public ResponseEntity<ReservationResponse> updateReservationStatus(@PathVariable Long reservationId) {
+    @PatchMapping("/reservations/{reservationId}/approve")
+    public ResponseEntity<ReservationResponse> approveWaitingReservation(@PathVariable Long reservationId) {
         reservationService.approveWaitingReservation(reservationId);
         return ResponseEntity.ok().build();
     }

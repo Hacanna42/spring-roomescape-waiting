@@ -27,7 +27,15 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(new CheckAdminInterceptor(cookieProvider, jwtTokenProvider))
-                .addPathPatterns("/admin/**");
+                .addPathPatterns("/admin/**")
+                .addPathPatterns("/reservations/**")
+                .excludePathPatterns("/reservations")
+                .addPathPatterns("/times/**")
+                .excludePathPatterns("/times")
+                .excludePathPatterns("/times/available")
+                .addPathPatterns("/themes/**")
+                .excludePathPatterns("/themes")
+                .excludePathPatterns("/themes/rank");
     }
 
     @Override

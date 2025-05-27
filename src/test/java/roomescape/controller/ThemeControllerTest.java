@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -15,14 +16,19 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import roomescape.auth.CookieProvider;
+import roomescape.auth.JwtTokenProvider;
 import roomescape.config.TestWebmvcConfiguration;
 import roomescape.controller.request.CreateThemeRequest;
+import roomescape.domain.MemberRole;
 import roomescape.domain.Theme;
+import roomescape.service.MemberService;
 import roomescape.service.ThemeService;
+import roomescape.service.result.MemberResult;
 import roomescape.service.result.ThemeResult;
 
 @WebMvcTest(ThemeController.class)
-@Import(TestWebmvcConfiguration.class)
+@Import({JwtTokenProvider.class, CookieProvider.class})
 class ThemeControllerTest {
 
     @Autowired
@@ -31,8 +37,20 @@ class ThemeControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
     @MockitoBean
     private ThemeService themeService;
+
+    @MockitoBean
+    private MemberService memberService;
+
+    private Cookie getAdminCookie() {
+        MemberResult memberResult = new MemberResult(1L, "히스타", MemberRole.ADMIN, "admin@email.com");
+        String token = jwtTokenProvider.createToken(memberResult);
+        return new Cookie("token", token);
+    }
 
     @DisplayName("GET: /themes 요청이 들어오면 200을 응답한다")
     @Test
@@ -64,10 +82,10 @@ class ThemeControllerTest {
         .andExpect(status().isCreated());
     }
 
-    @DisplayName("DELETE: /themes/{themeId} 요청이 들어오면 204를 응답한다")
+    @DisplayName("DELETE: /themes/{themeId} 요청이 어드민 권한과 함께 들어오면 204를 응답한다")
     @Test
     void deleteTest() throws Exception {
-        mockMvc.perform(delete("/themes/{themeId}", 1L))
+        mockMvc.perform(delete("/themes/{themeId}", 1L).cookie(getAdminCookie()))
                 .andExpect(status().isNoContent());
     }
 

@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import roomescape.domain.Member;
@@ -47,7 +46,7 @@ public class ReservationService {
         Member member = memberRepository.findById(createReservationParam.memberId()).orElseThrow(
                 () -> new NotFoundMemberException(createReservationParam.memberId() + "에 해당하는 정보가 없습니다."));
 
-        validateUniqueReservation(createReservationParam, reservationTime, theme);
+        validateUniqueReserveReservation(createReservationParam, reservationTime, theme);
         validateReservationDateTime(createReservationParam, currentDateTime, reservationTime);
 
         Reservation reservation = Reservation.makeTransientReservation(member, createReservationParam.date(), reservationTime, theme, createReservationParam.status());
@@ -87,7 +86,7 @@ public class ReservationService {
                 .toList();
     }
 
-    private void validateUniqueReservation(final CreateReservationParam createReservationParam, final ReservationTime reservationTime, final Theme theme) {
+    private void validateUniqueReserveReservation(final CreateReservationParam createReservationParam, final ReservationTime reservationTime, final Theme theme) {
         if (createReservationParam.status() == ReservationStatus.RESERVED && reservationRepository.existsByDateAndTimeIdAndThemeIdAndStatus(createReservationParam.date(), reservationTime.getId(), theme.getId(), ReservationStatus.RESERVED)) {
             throw new UnableReservationException("테마에 대해 날짜와 시간이 중복된 예약이 존재합니다.");
         }
